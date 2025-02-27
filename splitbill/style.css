@@ -1,0 +1,38 @@
+.container{
+    margin: 100px auto;
+    width: 500px;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5)
+}
+
+.container h2{
+    text-align: center;
+    padding-bottom: 5px;
+    border-bottom: 1px solid grey;
+}
+
+.container input{
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+.container label{
+    display: block;
+    margin-bottom: 10px;
+    font-size: larger;
+    font-weight: bold;
+}
+
+.container button{
+    padding: 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: larger;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
