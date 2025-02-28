@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GroupMemebers</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body onload="initMembersPage()">
+    <div class="container">
+        <h2>Manage Members for: <span id="groupNameDisplay"></span></h2>
+        <input type="text" id="memberName">
+        <button onclick="addMember()">Add Member</button>
+        <h3>Members List</h3>
+        <ul id="membersList"></ul>
+        <button onclick="goToExpenses()">Proceed to Expenses</button>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>

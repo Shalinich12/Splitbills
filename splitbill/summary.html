@@ -3,15 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>splitbills</title>
+    <title>Summary Bill Split App</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body onload="initSummaryPage()">
     <div class="container">
-        <h2>Create Group</h2>
-        <label for="groupName">Group Name</label>
-        <input type="text" id="groupName">
-        <button onclick="createGroup()">Create Group</button>
+        <h2>Final Balance Sheet</h2>
+        <ul id="balancesList"></ul>
+        <button onclick="restartApp()">Start Over</button>
     </div>
 
     <script src="app.js"></script>
