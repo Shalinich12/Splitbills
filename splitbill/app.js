@@ -1,152 +1,252 @@
-// creatinggroup functions
-function createGroup() {
-    const groupName = document.getElementById('groupName').value.trim();
-    if (groupName === '') {
-        alert('Please enter a group name.');
-        return;
-    }
-    if (groupName.length > 20) {
-        alert('Group name should not exceed 20 characters.');
-        return;
-    }
-
-    if (!/^[a-zA-Z0-9 ]+$/.test(groupName)) {  // only letters, numbers, spaces
-        alert('Group name can only contain letters, numbers, and spaces.');
-        return;
-    }
-    localStorage.setItem('groupName', groupName);
-    localStorage.setItem('members', JSON.stringify([]));
-    localStorage.setItem('expenses', JSON.stringify([]));
-    window.location.href = 'members.html';
-}
-
-
 // Utility functions
 function getStoredData(key) {
     return JSON.parse(localStorage.getItem(key)) || [];
 }
-function loadGroupName() {
-    const groupName = localStorage.getItem('groupName') || 'Unknown Group';
-    document.getElementById('groupNameDisplay').innerText = groupName;
-}
+
 function saveData(key, data) {
     localStorage.setItem(key, JSON.stringify(data));
 }
 
-// Members Page Functions
+function createGroup() {
+    const groupName = document.getElementById('groupName').value.trim();
+
+    if (!groupName) {
+        alert('Please enter a valid group name');
+        return;
+    }
+
+    const groups = getStoredData('groups');
+
+    const groupExists = groups.some(g => g.toLowerCase() === groupName.toLowerCase());
+
+    if (groupExists) {
+        alert('Group already exists. Please open it from the list or search it.');
+        return;
+    }
+    groups.push(groupName);
+    saveData('groups', groups);
+
+    // Initialize group-specific data
+    saveData(`${groupName}_members`, []);
+    saveData(`${groupName}_expenses`, []);
+
+    localStorage.setItem('currentGroup', groupName);
+    window.open('members.html', '_blank');
+}
+
+function loadGroups() {
+    const groups = getStoredData('groups');
+    renderGroups(groups);
+}
+
+function renderGroups(groups) {
+    const groupList = document.getElementById('groupList');
+    groupList.innerHTML = groups.map(g =>
+        `<li><button onclick="selectGroup('${g}')">${g}</button></li>`
+    ).join('');
+}
+
+function filterGroups() {
+    const search = document.getElementById('groupSearch').value.toLowerCase();
+    const groups = getStoredData('groups');
+    const filtered = groups.filter(g => g.toLowerCase().includes(search));
+    renderGroups(filtered);
+}
+
+function selectGroup(groupName) {
+    localStorage.setItem('currentGroup', groupName);
+    window.open('members.html', '_blank');
+}
+
+function getCurrentGroup() {
+    return localStorage.getItem('currentGroup');
+}
+
+// Member Management
 function addMember() {
     const memberName = document.getElementById('memberName').value.trim();
-    if (memberName === '') {
-        alert('Please enter a member name.');
-        return;
-    }
-    if (memberName.length > 20) {
-        alert('Member name should not exceed 20 characters.');
+    const group = getCurrentGroup();
+    const members = getStoredData(`${group}_members`);
+
+    if (!memberName || members.includes(memberName)) {
+        alert('Invalid or duplicate member');
         return;
     }
 
-    if (!/^[a-zA-Z]+$/.test(memberName)) {
-        alert('Member name can only contain letters, numbers, and spaces.');
-        return;
-    }
-
-    const members = getStoredData('members');
     members.push(memberName);
-    saveData('members', members);
+    saveData(`${group}_members`, members);
     renderMembers();
     document.getElementById('memberName').value = '';
 }
 
 function renderMembers() {
-    const members = getStoredData('members');
+    const group = getCurrentGroup();
+    const members = getStoredData(`${group}_members`);
     const membersList = document.getElementById('membersList');
-    membersList.innerHTML = '';
-    members.forEach((member, index) => {
-        const li = document.createElement('li');
-        li.innerHTML = `${member} <button onclick="removeMember(${index})">Remove</button>`;
-        membersList.appendChild(li);
-    });
+    membersList.innerHTML = members.map((m, i) =>
+        `<li>${m} <button onclick="removeMember(${i})">Remove</button></li>`
+    ).join('');
 }
 
 function removeMember(index) {
-    const members = getStoredData('members');
+    const group = getCurrentGroup();
+    const members = getStoredData(`${group}_members`);
     members.splice(index, 1);
-    saveData('members', members);
+    saveData(`${group}_members`, members);
     renderMembers();
 }
 
 function initMembersPage() {
-    document.getElementById('groupNameDisplay').innerText = localStorage.getItem('groupName') || 'Unnamed Group';
+    document.getElementById('groupNameDisplay').innerText = getCurrentGroup();
     renderMembers();
 }
 
 function goToExpenses() {
-    if (getStoredData('members').length === 0) {
-        alert('Please add members before proceeding.');
+    const group = getCurrentGroup();
+    if (getStoredData(`${group}_members`).length === 0) {
+        alert('Please add members first');
         return;
     }
-    window.location.href = 'expenses.html';
+    window.open('expenses.html', '_blank');
 }
 
-// Expenses Page Functions
+// Expense Management
 function addExpense() {
+    const group = getCurrentGroup();
     const payer = document.getElementById('payer').value;
     const amount = parseFloat(document.getElementById('amount').value);
+
     if (!payer || isNaN(amount) || amount <= 0) {
-        alert('Enter valid payer and amount.');
+        alert('Enter valid payer and amount');
         return;
     }
-    const expenses = getStoredData('expenses');
+
+    const expenses = getStoredData(`${group}_expenses`);
     expenses.push({ payer, amount });
-    saveData('expenses', expenses);
+    saveData(`${group}_expenses`, expenses);
+
     renderExpenses();
 }
 
 function renderExpenses() {
+    const group = getCurrentGroup();
+    const expenses = getStoredData(`${group}_expenses`);
     const expensesList = document.getElementById('expensesList');
-    expensesList.innerHTML = '';
-    getStoredData('expenses').forEach(exp => {
-        const li = document.createElement('li');
-        li.innerText = `${exp.payer} paid ₹${exp.amount}`;
-        expensesList.appendChild(li);
-    });
+
+    expensesList.innerHTML = expenses.map(exp => 
+        `<li>${exp.payer} paid ₹${exp.amount.toFixed(2)}</li>`
+    ).join('');
 }
 
 function initExpensesPage() {
-    const members = getStoredData('members');
+    const group = getCurrentGroup();
+    const members = getStoredData(`${group}_members`);
     const payerSelect = document.getElementById('payer');
-    payerSelect.innerHTML = members.map(member => `<option value="${member}">${member}</option>`).join('');
+
+    payerSelect.innerHTML = members.map(m => `<option value="${m}">${m}</option>`).join('');
     renderExpenses();
 }
 
 function viewSummary() {
-    window.location.href = 'summary.html';
+    window.open('summary.html', '_blank');
 }
 
-// Summary Page Functions
+// Balance Calculation
 function calculateBalances() {
-    const members = getStoredData('members');
-    const expenses = getStoredData('expenses');
+    const group = getCurrentGroup();
+    const members = getStoredData(`${group}_members`);
+    const expenses = getStoredData(`${group}_expenses`);
 
-    const balances = Object.fromEntries(members.map(m => [m, 0]));
-    const total = expenses.reduce((sum, e) => sum + e.amount, 0);
-    const share = total / members.length;
+    const balances = {};
+    members.forEach(m => balances[m] = 0);
 
     expenses.forEach(({ payer, amount }) => balances[payer] += amount);
-    members.forEach(m => balances[m] -= share);
+
+    const perPersonShare = expenses.reduce((sum, e) => sum + e.amount, 0) / members.length;
+
+    members.forEach(member => {
+        balances[member] -= perPersonShare;
+    });
 
     return balances;
 }
 
+function calculateWhoOwesWhom(balances) {
+    const transactions = [];
+
+    const creditors = [];
+    const debtors = [];
+
+    for (const [member, balance] of Object.entries(balances)) {
+        if (balance > 0) {
+            creditors.push({ member, amount: balance });
+        } else if (balance < 0) {
+            debtors.push({ member, amount: -balance });
+        }
+    }
+
+    while (debtors.length && creditors.length) {
+        const debtor = debtors[0];
+        const creditor = creditors[0];
+
+        const settlement = Math.min(debtor.amount, creditor.amount);
+        transactions.push(`${debtor.member} owes ₹${settlement.toFixed(2)} to ${creditor.member}`);
+
+        debtor.amount -= settlement;
+        creditor.amount -= settlement;
+
+        if (debtor.amount === 0) debtors.shift();
+        if (creditor.amount === 0) creditors.shift();
+    }
+
+    return transactions;
+}
+
 function initSummaryPage() {
     const balances = calculateBalances();
+    const transactions = calculateWhoOwesWhom(balances);
     const balancesList = document.getElementById('balancesList');
-    balancesList.innerHTML = Object.entries(balances).map(([m, b]) =>
-        `<li>${m} ${b >= 0 ? 'should receive' : 'owes'} ₹${Math.abs(b).toFixed(2)}</li>`
-    ).join('');
+
+    balancesList.innerHTML = transactions.map(t => `<li>${t}</li>`).join('');
 }
 
 function restartApp() {
-    localStorage.clear();
-    window.location.href = 'index.html';
+    const groups = getStoredData('groups');  // Save groups before clearing
+    localStorage.clear();  // Clear all data
+    saveData('groups', groups);  // Restore only the group names
+    window.open('index.html', '_blank');
+}
+function initGroupsPage() {
+    loadGroups();
+}
+
+document.addEventListener('DOMContentLoaded', initGroupsPage);
+
+function goBack() {
+    const currentPage = window.location.pathname.split('/').pop();
+
+    if (currentPage === 'members.html') {
+        window.location.href = 'index.html';  // Back to groups page
+    } else if (currentPage === 'expenses.html') {
+        window.location.href = 'members.html';  // Back to members page
+    } else if (currentPage === 'summary.html') {
+        window.location.href = 'expenses.html';  // Back to expenses page
+    }
+}
+
+function goNext() {
+    const currentPage = window.location.pathname.split('/').pop();
+
+    if (currentPage === 'index.html') {
+        const currentGroup = localStorage.getItem('currentGroup');
+        if (currentGroup) {
+            window.location.href = 'members.html';  // Go to members page if group is selected
+        } else {
+            alert('Please select or create a group first.');
+        }
+    } else if (currentPage === 'members.html') {
+        window.location.href = 'expenses.html';  // Go to expenses page
+    } else if (currentPage === 'expenses.html') {
+        window.location.href = 'summary.html';  // Go to summary page
+    }
 }

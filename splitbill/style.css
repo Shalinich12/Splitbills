@@ -1,48 +1,223 @@
+/* Reset and Global Styles */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', Arial, sans-serif;
+}
 
 body {
-    font-family: Arial, sans-serif;
+    background-color: #f7f7f7;
     display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+    justify-content: center;    
+    padding: 20px 0;
     margin: 0;
-    background-color: #f0f0f0;
 }
 
+/* Main Card Container */
 .container {
-    background-color: white;
+    background-color: #fff;
+    width: 95%;
+    max-width: 500px;
     padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-
-    text-align: center;
-    width: 100%;
-    height: 500px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    
 }
 
-button {
-    margin-top: 10px;
-    padding: 10px;
-    cursor: pointer;
-    background-color: green;
+/* Headings */
+h2, h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+   
 }
 
-ul {
-    list-style: none;
-    padding: 0;
-}
-
-li {
-    background: #f9f9f9;
-    margin: 5px 0;
-    padding: 8px;
+/* Inputs */
+input[type="text"], input[type="number"], select {
+    padding: 12px;
+    font-size: 15px;
     border: 1px solid #ddd;
+    border-radius: 8px;
+    outline: none;
+}
+
+input:focus {
+    border-color: #007bff;
+}
+
+/* Main Buttons (Primary Actions) */
+button {
+    padding: 14px;
+    font-size: 15px;
+    font-weight: 500;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    background-color: #28a745;
+    color: white;
+}
+
+/* Primary Button */
+button.primary {
+    background-color: #007bff;
+    color: white;
+    margin-top: 8px;
+}
+
+button.primary:hover {
+    background-color: #0056b3;
+}
+
+
+/* Back & Next Navigation Buttons */
+.navigation-buttons {
     display: flex;
     justify-content: space-between;
+    gap: 10px;
+    margin-top: auto;
+    padding-top: 12px;
+    border-top: 1px solid #eaeaea;
+    width: 200px;
 }
 
-input, select {
-    width: 400px;
+.navigation-buttons button {
+    flex: 1;
+    padding: 12px;
+    font-size: 15px;
+    background-color: #6c757d;
+    color: white;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.navigation-buttons button:hover {
+    background-color: #5a6268;
+}
+
+/* Group List */
+#groupList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fff;
+    
+}
+
+/* Each Group Item */
+#groupList li {
+    padding: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+   
+}
+
+/* Group Item Button */
+#groupList li button {
+    background-color: #28a745;
+    color: white;
+    font-size: 14px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.3s;
+}
+
+#groupList li button:hover {
+    background-color: #218838;
+}
+
+/* Members List */
+#membersList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fff;
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+/* Each Member Item */
+#membersList li {
+    padding: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+}
+
+/* Remove Member Button */
+#membersList li button {
+    background-color: #ff4d4f;
+    color: white;
+    font-size: 13px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.3s;
+}
+
+#membersList li button:hover {
+    background-color: #d9363e;
+}
+
+/* Expenses List */
+#expensesList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fff;
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+#expensesList li {
     padding: 10px;
-    margin: 5px 0;
+    border-bottom: 1px solid #eee;
+}
+
+/* Summary Balances List */
+#balancesList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fff;
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+#balancesList li {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+/* Responsive (for smaller devices) */
+@media (max-width: 480px) {
+    h2, h3 {
+        font-size: 16px;
+    }
+
+    button, input, select {
+        font-size: 14px;
+        padding: 10px;
+    }
 }

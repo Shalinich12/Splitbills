@@ -6,14 +6,23 @@
     <title>splitbills</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body onload="loadGroups()">
     <div class="container">
+        <h1>SplitBills App</h1>
         <h2>Create Group</h2>
         <label for="groupName">Group Name</label>
         <input type="text" id="groupName">
         <button onclick="createGroup()">Create Group</button>
+        
+        <h2>Existing Groups</h2>
+        <input type="text" id="groupSearch" oninput="filterGroups()">
+        <ul id="groupList"></ul>
+        <div class="navigation-buttons">
+            <button onclick="goBack()">⬅️ Back</button>
+            <button onclick="goNext()">Next ➡️</button>
+        </div>
     </div>
-
+    
     <script src="app.js"></script>
 </body>
 </html>
