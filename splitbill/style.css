@@ -1,223 +1,166 @@
-/* Reset and Global Styles */
+/* General Reset */
 * {
-    box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: 'Inter', Arial, sans-serif;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
 }
 
 body {
-    background-color: #f7f7f7;
+    background-color: #f8f9fa;
+    color: #333;
     display: flex;
-    justify-content: center;    
-    padding: 20px 0;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 20px;
     margin: 0;
 }
 
-/* Main Card Container */
+/* Container Styling */
 .container {
     background-color: #fff;
-    width: 95%;
-    max-width: 500px;
-    padding: 20px;
     border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
-    
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    width: 100%;
+    max-width: 600px;
+    transition: 0.3s;
+}
+
+.container:hover {
+    transform: translateY(-2px);
 }
 
 /* Headings */
-h2, h3 {
-    font-size: 18px;
+h1{
+    text-align: center;
+}
+h1, h2, h3 {
+    margin-bottom: 15px;
     font-weight: 600;
-    color: #333;
-    margin-bottom: 8px;
-   
+    color: #0056b3;
 }
 
-/* Inputs */
-input[type="text"], input[type="number"], select {
+/* Input Fields */
+input[type="text"],
+input[type="number"],
+select {
+    width: 100%;
     padding: 12px;
-    font-size: 15px;
+    margin: 10px 0 15px 0;
     border: 1px solid #ddd;
     border-radius: 8px;
+    font-size: 14px;
+    background-color: #f9f9f9;
+    transition: 0.3s;
+}
+
+input:focus, select:focus {
     outline: none;
-}
-
-input:focus {
     border-color: #007bff;
+    background-color: #fff;
 }
 
-/* Main Buttons (Primary Actions) */
+/* Buttons */
 button {
-    padding: 14px;
-    font-size: 15px;
-    font-weight: 500;
+    padding: 12px 20px;
     border: none;
     border-radius: 8px;
-    cursor: pointer;
-    background-color: #28a745;
-    color: white;
-}
-
-/* Primary Button */
-button.primary {
     background-color: #007bff;
-    color: white;
-    margin-top: 8px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: background-color 0.3s;
+    margin: 5px 0;
 }
 
-button.primary:hover {
+button:hover {
     background-color: #0056b3;
 }
 
-
-/* Back & Next Navigation Buttons */
-.navigation-buttons {
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
-    margin-top: auto;
-    padding-top: 12px;
-    border-top: 1px solid #eaeaea;
-    width: 200px;
-}
-
-.navigation-buttons button {
-    flex: 1;
-    padding: 12px;
-    font-size: 15px;
-    background-color: #6c757d;
-    color: white;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.navigation-buttons button:hover {
-    background-color: #5a6268;
+button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
 }
 
 /* Group List */
-#groupList {
-    list-style: none;
+ul {
+    list-style-type: none;
     padding: 0;
     margin: 0;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background-color: #fff;
-    
 }
 
-/* Each Group Item */
-#groupList li {
+ul li {
+    background-color: #f1f1f1;
     padding: 12px;
+    border-radius: 8px;
+    margin: 8px 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid #eee;
-   
 }
 
-/* Group Item Button */
-#groupList li button {
-    background-color: #28a745;
-    color: white;
-    font-size: 14px;
-    padding: 8px 12px;
-    border-radius: 6px;
-    cursor: pointer;
-    border: none;
-    transition: background-color 0.3s;
+ul li span {
+    font-weight: 500;
+    color: #555;
 }
 
-#groupList li button:hover {
-    background-color: #218838;
+ul li button {
+    padding: 6px 12px;
+    font-size: 12px;
+    margin-left: 5px;
+    background-color: #dc3545;
 }
 
-/* Members List */
-#membersList {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background-color: #fff;
-    max-height: 250px;
-    overflow-y: auto;
+ul li button:hover {
+    background-color: #c82333;
 }
 
-/* Each Member Item */
-#membersList li {
-    padding: 12px;
+/* Navigation Buttons */
+.navigation-buttons {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #eee;
+    margin-top: 20px;
 }
 
-/* Remove Member Button */
-#membersList li button {
-    background-color: #ff4d4f;
-    color: white;
-    font-size: 13px;
-    padding: 6px 10px;
-    border-radius: 6px;
-    cursor: pointer;
-    border: none;
-    transition: background-color 0.3s;
+/* Special Cases - Start Over Button */
+button.startover {
+    background-color: #ffc107;
+    color: #333;
 }
 
-#membersList li button:hover {
-    background-color: #d9363e;
+button.startover:hover {
+    background-color: #e0a800;
 }
 
-/* Expenses List */
-#expensesList {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background-color: #fff;
-    max-height: 250px;
-    overflow-y: auto;
-}
-
-#expensesList li {
-    padding: 10px;
-    border-bottom: 1px solid #eee;
-}
-
-/* Summary Balances List */
-#balancesList {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background-color: #fff;
-    max-height: 250px;
-    overflow-y: auto;
-}
-
-#balancesList li {
-    padding: 10px;
-    border-bottom: 1px solid #eee;
-}
-
-/* Responsive (for smaller devices) */
-@media (max-width: 480px) {
-    h2, h3 {
-        font-size: 16px;
+/* Responsive */
+@media (max-width: 600px) {
+    .container {
+        padding: 20px;
     }
 
-    button, input, select {
-        font-size: 14px;
+    h1, h2, h3 {
+        font-size: 1.2rem;
+    }
+
+    button {
+        width: 100%;
         padding: 10px;
+    }
+
+    .navigation-buttons {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    ul li {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    ul li button {
+        margin-top: 5px;
     }
 }

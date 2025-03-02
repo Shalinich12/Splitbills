@@ -211,7 +211,7 @@ function calculateWhoOwesWhom(balances) {
     while (debtors.length && creditors.length) {
         const debtor = debtors[0], creditor = creditors[0];
         const settlement = Math.min(debtor.amount, creditor.amount);
-        transactions.push(`${debtor.member} owes ₹${settlement.toFixed(2)} to ${creditor.member}`);
+        transactions.push(`${debtor.member} should pay ₹${settlement.toFixed(2)} to ${creditor.member}`);
 
         debtor.amount -= settlement;
         creditor.amount -= settlement;
