@@ -88,7 +88,7 @@ function addMember() {
 
     const members = getStoredData(`${group}_members`);
 
-    if (members.includes(memberName)) {
+    if (members.some(m => m.toLowerCase() === memberName.toLowerCase())) {
         alert('Member already exists.');
         return;
     }
@@ -133,37 +133,59 @@ function goToExpenses() {
 
 // Expense Management
 function addExpense() {
+    const group = getCurrentGroup();  // Get active group
     const payer = document.getElementById('payer').value;
     const amount = parseFloat(document.getElementById('amount').value);
-
-    if (!payer) {
-        alert('Please select a payer.');
-        return;
-    }
+    const purpose = document.getElementById('expensePurpose').value.trim() || 'Miscellaneous';
 
     if (isNaN(amount) || amount <= 0) {
-        alert('Please enter a valid positive amount.');
+        alert("Please enter a valid amount.");
         return;
     }
 
+    const expenses = getStoredData(`${group}_expenses`);  // Group-based expenses
+    expenses.push({ payer, amount, purpose });
+    saveData(`${group}_expenses`, expenses);  // Save back to localStorage
+
+    document.getElementById('amount').value = '';
+    document.getElementById('expensePurpose').value = '';
+    renderExpenses();  // Refresh display
+}
+
+
+function displayExpenses() {
+    const expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+    const expensesList = document.getElementById('expensesList');
+    expensesList.innerHTML = '';
+
+    expenses.forEach((expense, index) => {
+        const li = document.createElement('li');
+        li.innerHTML = `${expense.payer} paid ₹${expense.amount} for <strong>${expense.purpose}</strong>
+            <button onclick="removeExpense(${index})">Remove</button>`;
+        expensesList.appendChild(li);
+    });
+}
+
+function removeExpense(index) {
     const group = getCurrentGroup();
     const expenses = getStoredData(`${group}_expenses`);
-
-    expenses.push({ payer, amount });
+    expenses.splice(index, 1);
     saveData(`${group}_expenses`, expenses);
-
     renderExpenses();
-    document.getElementById('amount').value = '';
 }
+
 
 function renderExpenses() {
     const group = getCurrentGroup();
     const expenses = getStoredData(`${group}_expenses`);
-    const expensesList = document.getElementById('expensesList');
 
-    expensesList.innerHTML = expenses.map(exp =>
-        `<li>${exp.payer} paid ₹${exp.amount.toFixed(2)}</li>`
-    ).join('');
+    const expensesList = document.getElementById('expensesList');
+    expensesList.innerHTML = expenses.map((expense, index) => `
+        <li>
+            ${expense.payer} paid ₹${expense.amount.toFixed(2)} for <strong>${expense.purpose}</strong>
+            <button onclick="removeExpense(${index})">Remove</button>
+        </li>
+    `).join('');
 }
 
 function initExpensesPage() {
@@ -239,7 +261,7 @@ function restartApp() {
         // Optional: Preserve group names if you want to retain just the group list
         saveData('groups', groups);  
         
-        // Redirect to the main page (index.html) in the **same tab**
+        
         window.location.href = 'index.html';
     }
 }
