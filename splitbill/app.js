@@ -231,10 +231,14 @@ function calculateWhoOwesWhom(balances) {
     }
 
     while (debtors.length && creditors.length) {
-        const debtor = debtors[0], creditor = creditors[0];
+        const debtor = debtors[0]; 
+        const creditor = creditors[0];
         const settlement = Math.min(debtor.amount, creditor.amount);
-        transactions.push(`${debtor.member} should pay ₹${settlement.toFixed(2)} to ${creditor.member}`);
-
+        transactions.push({
+            debtor: debtor.member,
+            creditor: creditor.member,
+            amount: settlement
+        });
         debtor.amount -= settlement;
         creditor.amount -= settlement;
 
@@ -250,18 +254,53 @@ function initSummaryPage() {
     const transactions = calculateWhoOwesWhom(balances);
     const balancesList = document.getElementById('balancesList');
 
-    balancesList.innerHTML = transactions.map(t => `<li>${t}</li>`).join('');
+    balancesList.innerHTML = transactions.map(({ debtor, creditor, amount }, index) => {
+        const transactionKey = `${debtor}_${creditor}_${amount}`;
+        const isPaid = localStorage.getItem(transactionKey) === 'paid';
+
+        return `
+            <li id="transaction-${index}">
+                ${debtor} should pay ₹${amount.toFixed(2)} to ${creditor}
+                <br>
+                <button 
+                    id="payButton-${index}" 
+                    onclick="markPayment('${debtor}', '${creditor}', ${amount}, 'pay', ${index})"
+                    ${isPaid ? 'style="display:none;"' : ''}
+                >Pay</button>
+                <button 
+                    id="paidButton-${index}" 
+                    onclick="markPayment('${debtor}', '${creditor}', ${amount}, 'paid', ${index})"
+                    ${isPaid ? '' : 'style="display:none;"'}
+                >Paid</button>
+            </li>
+        `;
+    }).join('');
 }
+
+function markPayment(debtor, creditor, amount, action, index) {
+    const transactionKey = `${debtor}_${creditor}_${amount}`;
+
+    if (action === 'pay') {
+        alert(`${debtor} is paying ₹${amount.toFixed(2)} to ${creditor}.`);
+        localStorage.setItem(transactionKey, 'paid');
+
+        // Hide Pay button, show Paid button
+        document.getElementById(`payButton-${index}`).style.display = 'none';
+        document.getElementById(`paidButton-${index}`).style.display = 'inline-block';
+    } 
+    else if (action === 'paid') {
+        alert(`${creditor} confirms receiving ₹${amount.toFixed(2)} from ${debtor}.`);
+    }
+}
+
+
 function restartApp() {
-    const confirmReset = confirm('Are you sure you want to reset all data and start over? This will clear all expenses, members, and balances.');
+    const confirmReset = confirm('Are you sure you want to reset all data & start over? This will clear all expenses, members, and balances.');
     
     if (confirmReset) {
         const groups = getStoredData('groups');  // Fetch existing group names before clearing
-        
-        // Optional: Preserve group names if you want to retain just the group list
         saveData('groups', groups);  
-        
-        
+               
         window.location.href = 'index.html';
     }
 }
