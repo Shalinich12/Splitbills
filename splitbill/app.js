@@ -9,25 +9,19 @@ function saveData(key, data) {
 
 function createGroup() {
     const groupName = document.getElementById('groupName').value.trim();
-
     if (!groupName) {
         alert('Please enter a valid group name');
         return;
     }
-
     const groups = getStoredData('groups');
-
     if (groups.some(g => g.toLowerCase() === groupName.toLowerCase())) {
         alert('Group already exists. Please open it from the list or search it.');
         return;
     }
-
     groups.push(groupName);
     saveData('groups', groups);
-
     saveData(`${groupName}_members`, []);
     saveData(`${groupName}_expenses`, []);
-
     localStorage.setItem('currentGroup', groupName);
     window.location.href = 'members.html';
 }
@@ -79,20 +73,10 @@ function getCurrentGroup() {
 // Member Management
 function addMember() {
     const memberName = document.getElementById('memberName').value.trim();
+    if (!memberName) return alert('Enter member name');
     const group = getCurrentGroup();
-
-    if (!memberName) {
-        alert('Please enter a member name.');
-        return;
-    }
-
     const members = getStoredData(`${group}_members`);
-
-    if (members.some(m => m.toLowerCase() === memberName.toLowerCase())) {
-        alert('Member already exists.');
-        return;
-    }
-
+    if (members.includes(memberName)) return alert('Member exists');
     members.push(memberName);
     saveData(`${group}_members`, members);
     renderMembers();
@@ -142,9 +126,11 @@ function addExpense() {
         alert("Please enter a valid amount.");
         return;
     }
+    const now = new Date();
+    const dateTime = now.toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' }); 
 
     const expenses = getStoredData(`${group}_expenses`);  // Group-based expenses
-    expenses.push({ payer, amount, purpose });
+    expenses.push({ payer, amount, purpose, dateTime });
     saveData(`${group}_expenses`, expenses);  // Save back to localStorage
 
     document.getElementById('amount').value = '';
@@ -178,11 +164,14 @@ function removeExpense(index) {
 function renderExpenses() {
     const group = getCurrentGroup();
     const expenses = getStoredData(`${group}_expenses`);
-
+    expenses.sort((a, b) => new Date(b.dateTime) - new Date(a.dateTime));
     const expensesList = document.getElementById('expensesList');
     expensesList.innerHTML = expenses.map((expense, index) => `
         <li>
             ${expense.payer} paid ₹${expense.amount.toFixed(2)} for <strong>${expense.purpose}</strong>
+            <br>
+            <small>🕒 Paid on: ${expense.dateTime}</small>
+            <br>
             <button onclick="removeExpense(${index})">Remove</button>
         </li>
     `).join('');
@@ -255,40 +244,70 @@ function initSummaryPage() {
     const balancesList = document.getElementById('balancesList');
 
     balancesList.innerHTML = transactions.map(({ debtor, creditor, amount }, index) => {
-        const transactionKey = `${debtor}_${creditor}_${amount}`;
-        const isPaid = localStorage.getItem(transactionKey) === 'paid';
+        const transactionKey = `${debtor}_${creditor}_${amount}_history`;
+        const history = JSON.parse(localStorage.getItem(transactionKey)) || [];
+
+        const totalPaid = history.reduce((sum, record) => sum + record.amount, 0);
+        const isCleared = totalPaid >= amount;
 
         return `
-            <li id="transaction-${index}">
-                ${debtor} should pay ₹${amount.toFixed(2)} to ${creditor}
+            <li id="transaction-${index}" style="${isCleared ? 'background-color:#e6ffe6;' : ''}">
+                ${isCleared 
+                    ? `<div style="color:green;">
+                        <strong><span style="color:orangered;">${debtor}'s</span> Payment Cleared</strong>
+                        </div>
+                        ${displayPaymentHistory(history)}
+                       <br><small>✅ Total Paid: ₹${totalPaid.toFixed(2)} (Cleared)</small>`
+                    : `${debtor} should pay ₹${amount.toFixed(2)} to ${creditor}
+                       <br>${displayPaymentHistory(history)}`
+                }
                 <br>
                 <button 
                     id="payButton-${index}" 
                     onclick="markPayment('${debtor}', '${creditor}', ${amount}, 'pay', ${index})"
-                    ${isPaid ? 'style="display:none;"' : ''}
-                >Pay</button>
-                <button 
-                    id="paidButton-${index}" 
-                    onclick="markPayment('${debtor}', '${creditor}', ${amount}, 'paid', ${index})"
-                    ${isPaid ? '' : 'style="display:none;"'}
-                >Paid</button>
+                    ${isCleared ? 'style="display:none;"' : ''}>Pay</button>
             </li>
         `;
     }).join('');
 }
 
+function displayPaymentHistory(history) {
+    if (history.length === 0) {
+        return `<small>No payments made yet.</small>`;
+    }
+
+    return `
+        <b>💰 Payment History:</b><br>
+        <ul style="margin:0; padding:0; list-style:none;">
+            ${history.map(entry => `
+                <li>✅ ₹${entry.amount.toFixed(2)} on ${entry.dateTime}</li>
+            `).join('')}
+        </ul>
+    `;
+}
+
+
 function markPayment(debtor, creditor, amount, action, index) {
-    const transactionKey = `${debtor}_${creditor}_${amount}`;
+    const transactionKey = `${debtor}_${creditor}_${amount}_history`;
+
+    let history = JSON.parse(localStorage.getItem(transactionKey)) || [];
 
     if (action === 'pay') {
-        alert(`${debtor} is paying ₹${amount.toFixed(2)} to ${creditor}.`);
-        localStorage.setItem(transactionKey, 'paid');
+        const now = new Date();
+        const dateTime = now.toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' });
 
-        // Hide Pay button, show Paid button
-        document.getElementById(`payButton-${index}`).style.display = 'none';
-        document.getElementById(`paidButton-${index}`).style.display = 'inline-block';
-    } 
-    else if (action === 'paid') {
+        // Add new payment record to history
+        history.push({
+            amount,
+            dateTime
+        });
+
+        // Save back to localStorage
+        localStorage.setItem(transactionKey, JSON.stringify(history));
+
+        // Update UI
+        initSummaryPage();
+    } else if (action === 'paid') {
         alert(`${creditor} confirms receiving ₹${amount.toFixed(2)} from ${debtor}.`);
     }
 }
